@@ -10,33 +10,47 @@
             padding: 0;
             height: 100%;
             width: 100%;
+            overflow: hidden;
             font-family: Arial, sans-serif;
         }
-        .gallery {
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .gallery img {
-            max-width: 200px;
-            margin: 10px;
+
+        .background-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            transition: background-image 1s ease-in-out;
         }
     </style>
 </head>
 <body>
-    <div class="gallery" id="gallery"></div>
+    <div class="background-container" id="background-container"></div>
 
     <script>
         // 从和 index.html 同目录下的 images.json 获取图片列表
         fetch('images.json')
             .then(response => response.json())
             .then(data => {
-                const gallery = document.getElementById('gallery');
-                data.images.forEach(image => {
-                    const imgElement = document.createElement('img');
-                    imgElement.src = image;
-                    gallery.appendChild(imgElement);
-                });
+                const images = data.images;
+                let currentIndex = 0;
+                const changeInterval = 3000; // 每个图片显示3秒
+                const container = document.getElementById('background-container');
+
+                // 函数：切换背景图片
+                function changeBackground() {
+                    // 设置背景图片，使用 background-size: cover 平铺
+                    container.style.backgroundImage = `url('${images[currentIndex]}')`;
+                    // 更新索引
+                    currentIndex = (currentIndex + 1) % images.length;
+                }
+
+                // 初始显示第一张图片
+                changeBackground();
+                // 定时切换图片
+                setInterval(changeBackground, changeInterval);
             })
             .catch(error => console.error('获取图片失败:', error));
     </script>
