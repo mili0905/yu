@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yu and her friends</title>
+    <title>YU AND HER FRIENDS</title>
     <style>
         body, html {
             margin: 0;
@@ -20,8 +20,9 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-size: cover;
-            background-position: center;
+            background-size: contain;  /* 保证图片完整显示 */
+            background-repeat: no-repeat;  /* 防止图片重复 */
+            background-position: center;  /* 图片居中 */
             transition: background-image 1s ease-in-out;
         }
     </style>
@@ -41,7 +42,7 @@
 
                 // 函数：切换背景图片
                 function changeBackground() {
-                    // 设置背景图片，使用 background-size: cover 平铺
+                    // 设置背景图片，使用 background-size: contain 保证图片完整显示
                     container.style.backgroundImage = `url('${images[currentIndex]}')`;
                     // 更新索引
                     currentIndex = (currentIndex + 1) % images.length;
