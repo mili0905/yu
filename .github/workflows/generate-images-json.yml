@@ -1,0 +1,49 @@
+# .github/workflows/generate-images-json.yml
+
+name: Generate images.json
+
+# 触发条件：当推送到主分支，且 assets 文件夹发生更改时
+on:
+  push:
+    branches:
+      - main  # 如果您的主分支不是 main，请修改为对应的分支名称
+    paths:
+      - 'assets/**'  # 仅当 assets 文件夹下的文件发生更改时触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: 检出代码
+      uses: actions/checkout@v3
+      with:
+        persist-credentials: false  # 禁用自动令牌
+
+    - name: 设置 Node.js 版本
+      uses: actions/setup-node@v3
+      with:
+        node-version: '16'  # 或您需要的 Node.js 版本
+
+    - name: 安装依赖（如果有）
+      run: npm install
+
+    - name: 运行生成脚本
+      run: npm run generate-images
+
+    - name: 配置 Git 信息
+      run: |
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+
+    - name: 提交更改
+      run: |
+        git add images.json
+        git commit -m "自动更新 images.json [skip ci]"
+      continue-on-error: true  # 如果没有更改，此步骤会失败，忽略错误
+
+    - name: 推送更改
+      uses: ad-m/github-push-action@v0.6.0
+      with:
+        github_token: ${{ secrets.GITHUB_TOKEN }}
+        branch: main  # 替换为您的主分支名称
