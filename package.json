@@ -1,0 +1,11 @@
+{
+  "name": "yu",
+  "version": "1.0.0",
+  "description": "自动生成 images.json 文件",
+  "main": "index.js",
+  "scripts": {
+    "generate-images": "node scripts/generate-images-json.js"
+  },
+  "author": "您的姓名",
+  "license": "MIT"
+}
