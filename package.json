@@ -4,7 +4,8 @@
   "description": "自动生成 images.json 文件",
   "main": "index.js",
   "scripts": {
-    "generate-images": "node scripts/generate-images-json.js"
+    "generate-images": "node scripts/generate-images-json.js",
+    "build": "npm run generate-images && npm run build"
   },
   "author": "您的姓名",
   "license": "MIT"
