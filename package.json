@@ -5,7 +5,7 @@
   "main": "index.js",
   "scripts": {
     "generate-images": "node scripts/generate-images-json.js",
-    "build": "npm run generate-images && npm run buildwebsite"
+    "build": "npm run generate-images"
   },
   "author": "您的姓名",
   "license": "MIT"
