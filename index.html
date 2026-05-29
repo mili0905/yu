@@ -5,55 +5,374 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YU AND HER FRIENDS</title>
     <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            height: 100%;
-            width: 100%;
-            overflow: hidden;
-            font-family: Arial, sans-serif;
+        :root {
+            color-scheme: light;
+            --paper: #f7f4ee;
+            --ink: #181714;
+            --muted: #777168;
+            --line: rgba(24, 23, 20, 0.14);
+            --shadow: rgba(24, 23, 20, 0.12);
         }
 
-        .background-container {
-            position: absolute;
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background: var(--paper);
+            color: var(--ink);
+            font-family: Arial, "Helvetica Neue", sans-serif;
+        }
+
+        button {
+            font: inherit;
+        }
+
+        .site-header {
+            position: sticky;
             top: 0;
-            left: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 24px;
+            padding: 22px clamp(18px, 4vw, 56px);
+            background: rgba(247, 244, 238, 0.86);
+            border-bottom: 1px solid var(--line);
+            backdrop-filter: blur(18px);
+        }
+
+        .brand {
+            margin: 0;
+            font-size: clamp(18px, 2.4vw, 28px);
+            font-weight: 500;
+            letter-spacing: 0;
+        }
+
+        .photo-count {
+            color: var(--muted);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+
+        .intro {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: clamp(34px, 8vw, 92px) clamp(18px, 4vw, 56px) clamp(26px, 5vw, 56px);
+        }
+
+        .intro p {
+            max-width: 620px;
+            margin: 0;
+            color: var(--muted);
+            font-size: clamp(18px, 2vw, 26px);
+            line-height: 1.5;
+        }
+
+        .gallery {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 clamp(18px, 4vw, 56px) clamp(48px, 7vw, 92px);
+            columns: 1;
+            column-gap: 16px;
+        }
+
+        .photo {
+            display: block;
             width: 100%;
-            height: 100%;
-            background-size: contain;  /* 保证图片完整显示 */
-            background-repeat: no-repeat;  /* 防止图片重复 */
-            background-position: center;  /* 图片居中 */
-            transition: background-image 1s ease-in-out;
+            margin: 0 0 16px;
+            padding: 0;
+            overflow: hidden;
+            background: transparent;
+            border: 0;
+            cursor: pointer;
+            break-inside: avoid;
+        }
+
+        .photo img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 6px;
+            box-shadow: 0 18px 45px var(--shadow);
+            transition: opacity 180ms ease, transform 220ms ease;
+        }
+
+        .photo:hover img,
+        .photo:focus-visible img {
+            opacity: 0.84;
+            transform: scale(0.992);
+        }
+
+        .photo:focus-visible {
+            outline: 2px solid var(--ink);
+            outline-offset: 4px;
+        }
+
+        .lightbox {
+            position: fixed;
+            inset: 0;
+            z-index: 30;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 56px clamp(18px, 5vw, 72px);
+            background: rgba(15, 14, 12, 0.9);
+        }
+
+        .lightbox.is-open {
+            display: flex;
+        }
+
+        .lightbox img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            border-radius: 4px;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.35);
+        }
+
+        .lightbox-button {
+            position: absolute;
+            display: grid;
+            place-items: center;
+            width: 42px;
+            height: 42px;
+            color: #f7f4ee;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.24);
+            border-radius: 50%;
+            cursor: pointer;
+        }
+
+        .lightbox-button:hover,
+        .lightbox-button:focus-visible {
+            background: rgba(255, 255, 255, 0.18);
+            outline: none;
+        }
+
+        .close {
+            top: 18px;
+            right: 18px;
+            font-size: 24px;
+            line-height: 1;
+        }
+
+        .previous,
+        .next {
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 28px;
+        }
+
+        .previous {
+            left: 18px;
+        }
+
+        .next {
+            right: 18px;
+        }
+
+        .status {
+            position: absolute;
+            left: 18px;
+            bottom: 18px;
+            color: rgba(247, 244, 238, 0.76);
+            font-size: 13px;
+        }
+
+        .empty-state {
+            max-width: 1180px;
+            margin: 0 auto;
+            padding: 0 clamp(18px, 4vw, 56px) 64px;
+            color: var(--muted);
+        }
+
+        @media (min-width: 620px) {
+            .gallery {
+                columns: 2;
+            }
+        }
+
+        @media (min-width: 940px) {
+            .gallery {
+                columns: 3;
+            }
+        }
+
+        @media (max-width: 620px) {
+            .site-header {
+                align-items: flex-start;
+                flex-direction: column;
+                gap: 8px;
+            }
+
+            .lightbox {
+                padding: 58px 14px;
+            }
+
+            .previous,
+            .next {
+                top: auto;
+                bottom: 16px;
+                transform: none;
+            }
+
+            .status {
+                left: 50%;
+                bottom: 29px;
+                transform: translateX(-50%);
+            }
         }
     </style>
 </head>
 <body>
-    <div class="background-container" id="background-container"></div>
+    <header class="site-header">
+        <h1 class="brand">YU AND HER FRIENDS</h1>
+        <span class="photo-count" id="photo-count">Loading photos</span>
+    </header>
+
+    <main>
+        <section class="intro" aria-label="Introduction">
+            <p>A quiet collection of small moments, familiar faces, and images worth keeping close.</p>
+        </section>
+
+        <section class="gallery" id="gallery" aria-label="Photo gallery"></section>
+        <p class="empty-state" id="empty-state" hidden>No photos found.</p>
+    </main>
+
+    <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="Photo preview">
+        <button class="lightbox-button close" id="close-lightbox" type="button" aria-label="Close preview">&times;</button>
+        <button class="lightbox-button previous" id="previous-photo" type="button" aria-label="Previous photo">&#8249;</button>
+        <img id="preview-image" alt="">
+        <button class="lightbox-button next" id="next-photo" type="button" aria-label="Next photo">&#8250;</button>
+        <span class="status" id="preview-status"></span>
+    </div>
 
     <script>
-        // 从和 index.html 同目录下的 images.json 获取图片列表
-        fetch('images.json')
-            .then(response => response.json())
-            .then(data => {
-                const images = data.images;
-                let currentIndex = 0;
-                const changeInterval = 3000; // 每个图片显示3秒
-                const container = document.getElementById('background-container');
+        const gallery = document.getElementById("gallery");
+        const emptyState = document.getElementById("empty-state");
+        const photoCount = document.getElementById("photo-count");
+        const lightbox = document.getElementById("lightbox");
+        const previewImage = document.getElementById("preview-image");
+        const previewStatus = document.getElementById("preview-status");
+        const closeButton = document.getElementById("close-lightbox");
+        const previousButton = document.getElementById("previous-photo");
+        const nextButton = document.getElementById("next-photo");
+        const fallbackImages = [
+            "assets/01010001085155.jpg",
+            "assets/01010001123731.jpg",
+            "assets/01010001130351.jpg",
+            "assets/01010001150101.jpg",
+            "assets/01010001150500.jpg",
+            "assets/01010001164728.jpg",
+            "assets/01010001190553.jpg",
+            "assets/01010001190618.jpg",
+            "assets/01010001194300.jpg",
+            "assets/01010001204049.jpg",
+            "assets/01010001204716.jpg",
+            "assets/01010001205446.jpg",
+            "assets/art1.jpg",
+            "assets/art2.jpg",
+            "assets/art3.jpg",
+            "assets/art4.jpg"
+        ];
 
-                // 函数：切换背景图片
-                function changeBackground() {
-                    // 设置背景图片，使用 background-size: contain 保证图片完整显示
-                    container.style.backgroundImage = `url('${images[currentIndex]}')`;
-                    // 更新索引
-                    currentIndex = (currentIndex + 1) % images.length;
-                }
+        let images = [];
+        let currentIndex = 0;
 
-                // 初始显示第一张图片
-                changeBackground();
-                // 定时切换图片
-                setInterval(changeBackground, changeInterval);
-            })
-            .catch(error => console.error('获取图片失败:', error));
+        function updatePhotoCount() {
+            const label = images.length === 1 ? "1 photo" : `${images.length} photos`;
+            photoCount.textContent = label;
+        }
+
+        function openLightbox(index) {
+            currentIndex = index;
+            previewImage.src = images[currentIndex];
+            previewImage.alt = `Photo ${currentIndex + 1}`;
+            previewStatus.textContent = `${currentIndex + 1} / ${images.length}`;
+            lightbox.classList.add("is-open");
+            document.body.style.overflow = "hidden";
+            closeButton.focus();
+        }
+
+        function closeLightbox() {
+            lightbox.classList.remove("is-open");
+            document.body.style.overflow = "";
+            previewImage.src = "";
+        }
+
+        function showAdjacentPhoto(direction) {
+            currentIndex = (currentIndex + direction + images.length) % images.length;
+            openLightbox(currentIndex);
+        }
+
+        function renderGallery() {
+            gallery.innerHTML = "";
+            images.forEach((image, index) => {
+                const button = document.createElement("button");
+                const img = document.createElement("img");
+
+                button.className = "photo";
+                button.type = "button";
+                button.setAttribute("aria-label", `Open photo ${index + 1}`);
+
+                img.src = image;
+                img.alt = `YU AND HER FRIENDS photo ${index + 1}`;
+                img.loading = "lazy";
+
+                button.appendChild(img);
+                button.addEventListener("click", () => openLightbox(index));
+                gallery.appendChild(button);
+            });
+        }
+
+        function useImages(nextImages) {
+            images = nextImages;
+            updatePhotoCount();
+
+            if (!images.length) {
+                emptyState.hidden = false;
+                return;
+            }
+
+            renderGallery();
+        }
+
+        fetch("images.json")
+            .then((response) => response.json())
+            .then((data) => useImages(Array.isArray(data.images) ? data.images : fallbackImages))
+            .catch(() => useImages(fallbackImages));
+
+        closeButton.addEventListener("click", closeLightbox);
+        previousButton.addEventListener("click", () => showAdjacentPhoto(-1));
+        nextButton.addEventListener("click", () => showAdjacentPhoto(1));
+
+        lightbox.addEventListener("click", (event) => {
+            if (event.target === lightbox) {
+                closeLightbox();
+            }
+        });
+
+        document.addEventListener("keydown", (event) => {
+            if (!lightbox.classList.contains("is-open")) {
+                return;
+            }
+
+            if (event.key === "Escape") {
+                closeLightbox();
+            }
+
+            if (event.key === "ArrowLeft") {
+                showAdjacentPhoto(-1);
+            }
+
+            if (event.key === "ArrowRight") {
+                showAdjacentPhoto(1);
+            }
+        });
     </script>
 </body>
 </html>
